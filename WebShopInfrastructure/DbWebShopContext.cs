@@ -96,6 +96,10 @@ public partial class DbWebShopContext : DbContext
             entity.Property(e => e.Categoryname)
                 .HasMaxLength(100)
                 .HasColumnName("categoryname");
+
+            entity.Property(e => e.Categoryinfo)
+        .HasMaxLength(255)
+        .HasColumnName("categoryinfo");
         });
 
         modelBuilder.Entity<Changetype>(entity =>
