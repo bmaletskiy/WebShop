@@ -11,7 +11,7 @@ public partial class Category : Entity
     public string Categoryname { get; set; } = null!;
 
     [Display(Name = "Інформація про категорію")]
-    public string Categoryinfo { get; set; } = null!;
+    public string? Categoryinfo { get; set; } = null!;
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
