@@ -7,7 +7,7 @@
 <h1>Товари за категорією @ViewBag.CategoryName</h1>
 
 <p>
-    <a asp-action="Create" asp-route-id="@ViewBag.CategoryId">Створити новий товар</a>"
+    @Html.ActionLink("Додати новий товар", "Create", new { categoryId = ViewBag.Categoryid })
 </p>
 <table class="table">
     <thead>

@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebShopDomain.Model;
 
 public partial class Product : Entity
 {
-
+    [Display(Name = "Категорія")]
     public int? Categoryid { get; set; }
-
+    [Display(Name = "Назва")]
     public string Name { get; set; } = null!;
-
+    [Display(Name = "Опис")]
     public string? Description { get; set; }
-
+    [Display(Name = "Ціна")]
     public decimal Price { get; set; }
-
+    [Display(Name = "Кількість")]
     public int Availableqty { get; set; }
 
     public DateTime? Createdat { get; set; }

@@ -22,10 +22,11 @@ namespace WebShopInfrastructure.Controllers
         // GET: Products
         public async Task<IActionResult> Index(int? id, string? name)
         {
-            if(id == null) return RedirectToAction("Categories", "Index");
-            ViewBag.Categoryid = id;   
-            ViewBag.Categoryname = name;    
-            var dbWebShopContext = _context.Products.Include(p => p.Category);
+            if (id == null)
+                return RedirectToAction("Index", "Categories");
+            ViewBag.Categoryid = id;
+            ViewBag.Categoryname = name;
+            var dbWebShopContext = _context.Products.Where(b => b.Categoryid == id).Include(p => p.Category);
             return View(await dbWebShopContext.ToListAsync());
         }
 
