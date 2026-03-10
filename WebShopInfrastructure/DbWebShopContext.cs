@@ -267,7 +267,7 @@ public partial class DbWebShopContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(150)
                 .HasColumnName("name");
-            entity.Property(e => e.Price)
+            entity.Property(e => e.Price) 
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
             entity.Property(e => e.Updatedat)
@@ -277,6 +277,7 @@ public partial class DbWebShopContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.Categoryid)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("product_categoryid_fkey");
         });
 
