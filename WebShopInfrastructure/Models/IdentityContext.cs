@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WebShopDomain.model;
-using WebShopInfrastructure.Models;
+using WebShop.Models;
 
 namespace WebShopInfrastructure
 {
@@ -10,7 +9,6 @@ namespace WebShopInfrastructure
         public IdentityContext(DbContextOptions<IdentityContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
         }
     }
 }

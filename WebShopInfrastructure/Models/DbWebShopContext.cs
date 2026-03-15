@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using WebShopDomain.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebShopInfrastructure;
+namespace WebShopInfrastructure.Models;
 
 public partial class DbWebShopContext : DbContext
 {

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebShopDomain.Model;
-using WebShopInfrastructure;
+using WebShopInfrastructure.Models;
 
 namespace WebShopInfrastructure.Controllers
 {
