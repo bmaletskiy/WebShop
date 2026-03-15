@@ -86,5 +86,11 @@ namespace WebShop.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Carts");
         }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
