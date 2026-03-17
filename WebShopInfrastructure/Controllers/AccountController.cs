@@ -38,7 +38,8 @@ namespace WebShop.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Carts");
+                    await _signInManager.SignInAsync(user, false);
+                    return RedirectToAction("Index", "Home");
                 }
 
                 foreach (var error in result.Errors)
@@ -69,7 +70,7 @@ namespace WebShop.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Carts");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -84,7 +85,7 @@ namespace WebShop.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Carts");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebShopDomain.Model;
 using WebShopInfrastructure.Models;
 
 namespace WebShopInfrastructure.Controllers
 {
+    [Authorize]
     public class CartsController : Controller
     {
         private readonly DbWebShopContext _context;
@@ -19,146 +16,158 @@ namespace WebShopInfrastructure.Controllers
             _context = context;
         }
 
-        // GET: Carts
         public async Task<IActionResult> Index()
         {
-            var dbWebShopContext = _context.Carts.Include(c => c.Customer);
-            return View(await dbWebShopContext.ToListAsync());
-        }
-
-        // GET: Carts/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            int? customerId = await GetCurrentCustomerIdAsync();
+            if (customerId == null)
+                return RedirectToAction("Login", "Account");
 
             var cart = await _context.Carts
-                .Include(c => c.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(c => c.Cartitems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.Customerid == customerId);
+
             if (cart == null)
             {
-                return NotFound();
-            }
+                cart = new Cart
+                {
+                    Customerid = customerId,
+                    Createdat = DateTime.Now,
+                    Updatedat = DateTime.Now
+                };
 
-            return View(cart);
-        }
-
-        // GET: Carts/Create
-        public IActionResult Create()
-        {
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Email");
-            return View();
-        }
-
-        // POST: Carts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Customerid,Createdat,Updatedat,Id")] Cart cart)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(cart);
+                _context.Carts.Add(cart);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Email", cart.Customerid);
+
             return View(cart);
         }
 
-        // GET: Carts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cart = await _context.Carts.FindAsync(id);
-            if (cart == null)
-            {
-                return NotFound();
-            }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Email", cart.Customerid);
-            return View(cart);
-        }
-
-        // POST: Carts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Customerid,Createdat,Updatedat,Id")] Cart cart)
+        public async Task<IActionResult> AddToCart(int productId)
         {
-            if (id != cart.Id)
-            {
-                return NotFound();
-            }
+            int? customerId = await GetCurrentCustomerIdAsync();
+            if (customerId == null)
+                return RedirectToAction("Login", "Account");
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(cart);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CartExists(cart.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["Customerid"] = new SelectList(_context.Customers, "Id", "Email", cart.Customerid);
-            return View(cart);
-        }
-
-        // GET: Carts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+            if (product == null)
                 return NotFound();
-            }
 
             var cart = await _context.Carts
-                .Include(c => c.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(c => c.Cartitems)
+                .FirstOrDefaultAsync(c => c.Customerid == customerId);
+
             if (cart == null)
             {
-                return NotFound();
+                cart = new Cart
+                {
+                    Customerid = customerId,
+                    Createdat = DateTime.Now,
+                    Updatedat = DateTime.Now
+                };
+
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync();
             }
 
-            return View(cart);
-        }
+            var existingItem = cart.Cartitems.FirstOrDefault(ci => ci.Productid == productId);
 
-        // POST: Carts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var cart = await _context.Carts.FindAsync(id);
-            if (cart != null)
+            if (existingItem == null)
             {
-                _context.Carts.Remove(cart);
+                var cartItem = new Cartitem
+                {
+                    Cartid = cart.Id,
+                    Productid = productId,
+                    Quantity = 1
+                };
+
+                _context.Cartitems.Add(cartItem);
             }
+            else
+            {
+                existingItem.Quantity = (existingItem.Quantity ?? 0) + 1;
+            }
+
+            cart.Updatedat = DateTime.Now;
 
             await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remove(int productId)
+        {
+            int? customerId = await GetCurrentCustomerIdAsync();
+            if (customerId == null)
+                return RedirectToAction("Login", "Account");
+
+            var cart = await _context.Carts
+                .Include(c => c.Cartitems)
+                .FirstOrDefaultAsync(c => c.Customerid == customerId);
+
+            if (cart == null)
+                return RedirectToAction(nameof(Index));
+
+            var cartItem = cart.Cartitems.FirstOrDefault(ci => ci.Productid == productId);
+
+            if (cartItem != null)
+            {
+                _context.Cartitems.Remove(cartItem);
+                cart.Updatedat = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CartExists(int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Clear()
         {
-            return _context.Carts.Any(e => e.Id == id);
+            int? customerId = await GetCurrentCustomerIdAsync();
+            if (customerId == null)
+                return RedirectToAction("Login", "Account");
+
+            var cart = await _context.Carts
+                .Include(c => c.Cartitems)
+                .FirstOrDefaultAsync(c => c.Customerid == customerId);
+
+            if (cart != null && cart.Cartitems.Any())
+            {
+                _context.Cartitems.RemoveRange(cart.Cartitems);
+                cart.Updatedat = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<int?> GetCurrentCustomerIdAsync()
+        {
+            var email = User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(email))
+                return null;
+
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Email == email);
+
+            if (customer == null)
+            {
+                customer = new Customer
+                {
+                    Email = email,
+                    Fullname = email
+                };
+
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+            }
+
+            return customer.Id;
         }
     }
 }
