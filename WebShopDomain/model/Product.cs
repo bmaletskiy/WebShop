@@ -23,7 +23,7 @@ public partial class Product : Entity
     public DateTime? Updatedat { get; set; }
 
     public virtual ICollection<Cartitem> Cartitems { get; set; } = new List<Cartitem>();
-
+    [Display(Name="Категорія")]
     public virtual Category? Category { get; set; }
 
     public virtual ICollection<Orderitem> Orderitems { get; set; } = new List<Orderitem>();

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Cart";
 }
 
-<h1>My Cart</h1>
+<h1>Мій кошик</h1>
 
 @if (!Model.Cartitems.Any())
 {
@@ -22,10 +22,10 @@ else
                     @Html.DisplayNameFor(model => model.Cartitems.First().Quantity)
                 </th>
                 <th>
-                    Price
+                    Ціна за шт.
                 </th>
                 <th>
-                    Total
+                    В загальному
                 </th>
                 <th></th>
             </tr>
@@ -66,6 +66,15 @@ else
 
     <form asp-action="Clear" method="post">
         <button class="btn btn-warning">Clear cart</button>
+        @{
+            var total = Model.Cartitems.Sum(x => x.Product.Price * x.Quantity);
+        }
+
+        <h3>Загальна сума: @total ₴</h3>
+
+        <form asp-action="Checkout" method="post">
+            <button class="btn btn-success">Оплатити</button>
+        </form>
     </form>
 
 }

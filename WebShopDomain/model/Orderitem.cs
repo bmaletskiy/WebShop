@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 
 namespace WebShopDomain.Model;
@@ -14,7 +15,7 @@ public partial class Orderitem : Entity
 
     public decimal Unitprice { get; set; }
 
-    public decimal Totalprice { get; set; }
+    public decimal Totalprice {get; set; }
 
     public virtual Order? Order { get; set; }
 
