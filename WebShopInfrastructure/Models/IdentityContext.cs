@@ -10,5 +10,14 @@ namespace WebShopInfrastructure
             : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<User>()
+                .Property(u => u.BirthDate)
+                .HasColumnType("date");
+        }
     }
 }

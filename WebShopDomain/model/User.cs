@@ -4,6 +4,6 @@ namespace WebShop.Models
 {
     public class User : IdentityUser
     {
-        public int Year { get; set; }
+        public DateOnly? BirthDate { get; set; }
     }
 }

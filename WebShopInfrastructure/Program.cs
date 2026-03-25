@@ -14,9 +14,16 @@ builder.Services.AddDbContext<DbWebShopContext>(option =>
 builder.Services.AddDbContext<IdentityContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("IdentityConnection")));
 
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<IdentityContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+})
+.AddEntityFrameworkStores<IdentityContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -25,6 +32,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    await RoleInitializer.InitializeAsync(userManager, roleManager);
+}
 
 if (!app.Environment.IsDevelopment())
 {
@@ -44,13 +59,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var userManager = services.GetRequiredService<UserManager<User>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    await RoleInitializer.InitializeAsync(userManager, roleManager);
-}
 
 app.Run();

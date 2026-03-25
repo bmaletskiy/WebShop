@@ -10,8 +10,9 @@ namespace WebShop.Models
         public string Email { get; set; }
 
         [Required]
-        [Display(Name = "Рік народження")]
-        public int Year { get; set; }
+        [Display(Name = "Дата народження")]
+        [DataType(DataType.Date)]
+        public DateOnly BirthDate { get; set; }
 
         [Required]
         [Display(Name = "Пароль")]

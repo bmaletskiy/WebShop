@@ -14,7 +14,7 @@ public partial class Product : Entity
     [Display(Name = "Опис")]
     public string? Description { get; set; }
     [Display(Name = "Ціна")]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
     [Display(Name = "Кількість")]
     public int Availableqty { get; set; }
 

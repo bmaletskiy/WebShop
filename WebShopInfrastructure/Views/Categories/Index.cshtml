@@ -4,11 +4,15 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Редактор категорій</h1>
+<h1>Категорії</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -22,20 +26,26 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoryname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoryinfo)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categoryname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categoryinfo)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <span> | </span>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

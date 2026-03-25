@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebShopInfrastructure.Models;
@@ -11,9 +12,11 @@ using WebShopInfrastructure.Models;
 namespace WebShopInfrastructure.Migrations
 {
     [DbContext(typeof(DbWebShopContext))]
-    partial class DbWebShopContextModelSnapshot : ModelSnapshot
+    [Migration("20260324223206_AddBirthDateToUser")]
+    partial class AddBirthDateToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

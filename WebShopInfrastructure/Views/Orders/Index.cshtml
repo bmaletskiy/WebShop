@@ -1,0 +1,42 @@
+﻿@model IEnumerable<WebShopDomain.Model.Order>
+
+@{
+    ViewData["Title"] = "Мої замовлення";
+}
+
+<h1>Мої замовлення</h1>
+
+@if (!Model.Any())
+{
+    <p>У вас ще немає замовлень.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Номер замовлення</th>
+                <th>Дата</th>
+                <th>Сума</th>
+                <th>Статус</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Orderdate?.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@item.Totalamount ₴</td>
+                    <td>@item.Orderstatus?.Statusname</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
+                            Деталі
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

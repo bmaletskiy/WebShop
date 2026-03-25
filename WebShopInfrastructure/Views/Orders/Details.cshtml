@@ -1,0 +1,37 @@
+﻿@model WebShopDomain.Model.Order
+
+@{
+    ViewData["Title"] = "Деталі замовлення";
+}
+
+<h1>Замовлення №@Model.Id</h1>
+
+<p><strong>Дата:</strong> @Model.Orderdate?.ToString("dd.MM.yyyy HH:mm")</p>
+<p><strong>Статус:</strong> @Model.Orderstatus?.Statusname</p>
+<p><strong>Сума:</strong> @Model.Totalamount ₴</p>
+
+<h3>Товари</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Товар</th>
+            <th>Кількість</th>
+            <th>Ціна за шт.</th>
+            <th>Разом</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Orderitems)
+        {
+            <tr>
+                <td>@item.Product?.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Unitprice ₴</td>
+                <td>@item.Totalprice ₴</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Назад</a>

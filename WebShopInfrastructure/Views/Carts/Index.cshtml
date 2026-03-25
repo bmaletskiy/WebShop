@@ -12,6 +12,8 @@
 }
 else
 {
+    var total = Model.Cartitems.Sum(x => x.Product.Price * x.Quantity);
+
     <table class="table">
         <thead>
             <tr>
@@ -30,28 +32,14 @@ else
                 <th></th>
             </tr>
         </thead>
-
         <tbody>
-
             @foreach (var item in Model.Cartitems)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Product.Name)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Quantity)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Product.Price)
-                    </td>
-
-                    <td>
-                        @(item.Product.Price* item.Quantity)
-                    </td>
-
+                    <td>@Html.DisplayFor(modelItem => item.Product.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Product.Price)</td>
+                    <td>@(item.Product.Price* item.Quantity)</td>
                     <td>
                         <form asp-action="Remove" method="post">
                             <input type="hidden" name="productId" value="@item.Productid" />
@@ -60,21 +48,17 @@ else
                     </td>
                 </tr>
             }
-
         </tbody>
     </table>
 
     <form asp-action="Clear" method="post">
         <button class="btn btn-warning">Clear cart</button>
-        @{
-            var total = Model.Cartitems.Sum(x => x.Product.Price * x.Quantity);
-        }
-
-        <h3>Загальна сума: @total ₴</h3>
-
-        <form asp-action="Checkout" method="post">
-            <button class="btn btn-success">Оплатити</button>
-        </form>
     </form>
 
+    <h3>Загальна сума: @total ₴</h3>
+
+    <form asp-controller="Carts" asp-action="Checkout" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-success">Оплатити</button>
+    </form>
 }

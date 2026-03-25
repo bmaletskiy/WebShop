@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WebShopDomain.Model;
 using WebShopInfrastructure.Models;
 
@@ -26,6 +27,7 @@ namespace WebShopInfrastructure.Controllers
         }
 
         // GET: Categories/Details/5
+       
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,6 +46,7 @@ namespace WebShopInfrastructure.Controllers
         }
 
         // GET: Categories/Create
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +69,7 @@ namespace WebShopInfrastructure.Controllers
         }
 
         // GET: Categories/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -117,6 +121,7 @@ namespace WebShopInfrastructure.Controllers
         }
 
         // GET: Categories/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

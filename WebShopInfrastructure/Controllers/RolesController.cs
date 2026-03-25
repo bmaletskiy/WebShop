@@ -6,7 +6,7 @@ using WebShopInfrastructure.ViewModel;
 
 namespace WebShop.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public class RolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;

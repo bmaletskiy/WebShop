@@ -6,7 +6,6 @@ using WebShopInfrastructure.Models;
 
 namespace WebShopInfrastructure.Controllers
 {
-    [Authorize]
     public class CartsController : Controller
     {
         private readonly DbWebShopContext _context;
@@ -168,6 +167,61 @@ namespace WebShopInfrastructure.Controllers
             }
 
             return customer.Id;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Checkout()
+        {
+            try
+            {
+                int? customerId = await GetCurrentCustomerIdAsync();
+                if (customerId == null)
+                    return RedirectToAction("Login", "Account");
+
+                var cart = await _context.Carts
+                    .Include(c => c.Cartitems)
+                    .ThenInclude(ci => ci.Product)
+                    .FirstOrDefaultAsync(c => c.Customerid == customerId);
+
+                if (cart == null) return Content("ПОМИЛКА: Cart not found");
+                if (!cart.Cartitems.Any()) return Content("ПОМИЛКА: Cart is empty");
+
+                var total = cart.Cartitems.Sum(ci => (ci.Product.Price ?? 0) * (ci.Quantity ?? 0));
+
+                var order = new Order
+                {
+                    Customerid = customerId,
+                    Orderstatusid = 1,
+                    Orderdate = DateTime.Now,
+                    Totalamount = total
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                foreach (var item in cart.Cartitems)
+                {
+                    var orderItem = new Orderitem
+                    {
+                        Orderid = order.Id,
+                        Productid = item.Productid,
+                        Quantity = item.Quantity ?? 0,
+                        Unitprice = item.Product?.Price ?? 0,
+                        Totalprice = (item.Product?.Price ?? 0) * (item.Quantity ?? 0)
+                    };
+                    _context.Orderitems.Add(orderItem);
+                }
+
+                _context.Cartitems.RemoveRange(cart.Cartitems);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", "Orders");
+            }
+            catch (Exception ex)
+            {
+                return Content($"ПОМИЛКА: {ex.Message} | Inner: {ex.InnerException?.Message}");
+            }
         }
     }
 }

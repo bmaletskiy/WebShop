@@ -31,13 +31,15 @@ namespace WebShop.Controllers
                 {
                     Email = model.Email,
                     UserName = model.Email,
-                    Year = model.Year
+                    BirthDate = model.BirthDate
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "user");
+
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
@@ -51,6 +53,7 @@ namespace WebShop.Controllers
             return View(model);
         }
 
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -62,11 +65,21 @@ namespace WebShop.Controllers
         {
             if (ModelState.IsValid)
             {
+                Console.WriteLine($"Спроба входу: {model.Email} / {model.Password}");
+
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                Console.WriteLine($"Користувач знайдений: {user != null}");
+
                 var result = await _signInManager.PasswordSignInAsync(
                     model.Email,
                     model.Password,
                     model.RememberMe,
                     false);
+
+                Console.WriteLine($"Succeeded: {result.Succeeded}");
+                Console.WriteLine($"IsLockedOut: {result.IsLockedOut}");
+                Console.WriteLine($"IsNotAllowed: {result.IsNotAllowed}");
+                Console.WriteLine($"RequiresTwoFactor: {result.RequiresTwoFactor}");
 
                 if (result.Succeeded)
                 {
