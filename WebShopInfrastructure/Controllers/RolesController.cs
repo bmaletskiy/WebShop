@@ -72,7 +72,6 @@ namespace WebShop.Controllers
             var addedRoles = roles.Except(userRoles);
             var removedRoles = userRoles.Except(roles);
 
-            // захист від зняття ролі Admin у самого себе
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser != null &&
                 user.Id == currentUser.Id &&

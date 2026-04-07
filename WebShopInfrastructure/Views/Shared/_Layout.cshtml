@@ -21,17 +21,34 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="mainNavbar">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Мої замовлення</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Категорії</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Carts" asp-action="Index">Кошик</a>
-                        </li>
-                    </ul>
+
+                    @* Менеджер *@
+                    @if (User.Identity != null && User.Identity.IsAuthenticated
+                        && User.IsInRole("manager"))
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">Замовлення</a>
+                            </li>
+                        </ul>
+                    }
+
+                    @* Звичайний користувач *@
+                    @if (User.Identity != null && User.Identity.IsAuthenticated
+                        && !User.IsInRole("admin") && !User.IsInRole("manager"))
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">Мої замовлення</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Categories" asp-action="Index">Категорії</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Carts" asp-action="Index">Кошик</a>
+                            </li>
+                        </ul>
+                    }
 
                     <ul class="navbar-nav">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)

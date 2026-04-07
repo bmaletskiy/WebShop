@@ -15,6 +15,7 @@ namespace WebShopInfrastructure.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "user, admin")]
         public async Task<IActionResult> Index()
         {
             int? customerId = await GetCurrentCustomerIdAsync();

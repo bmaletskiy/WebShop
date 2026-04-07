@@ -10,21 +10,20 @@ namespace WebShopInfrastructure
             string adminEmail = "admin@gmail.com";
             string password = "Admin_1234";
 
-            Console.WriteLine("=== RoleInitializer запустився ===");
-
             if (await roleManager.FindByNameAsync("admin") == null)
             {
                 var roleResult = await roleManager.CreateAsync(new IdentityRole("admin"));
                 Console.WriteLine($"Роль admin створена: {roleResult.Succeeded}");
             }
-            else
-            {
-                Console.WriteLine("Роль admin вже існує");
-            }
 
             if (await roleManager.FindByNameAsync("user") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("user"));
+            }
+
+            if (await roleManager.FindByNameAsync("manager") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("manager"));
             }
 
             if (await userManager.FindByNameAsync(adminEmail) == null)
