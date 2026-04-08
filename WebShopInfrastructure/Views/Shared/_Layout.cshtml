@@ -11,45 +11,60 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebShop</a>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">WebShop</a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Перемкнути навігацію">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="mainNavbar">
 
-                    @* Менеджер *@
-                    @if (User.Identity != null && User.Identity.IsAuthenticated
-                        && User.IsInRole("manager"))
-                    {
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">Замовлення</a>
-                            </li>
-                        </ul>
-                    }
+                    <!-- ЛІВЕ МЕНЮ -->
+                    <ul class="navbar-nav me-auto">
 
-                    @* Звичайний користувач *@
-                    @if (User.Identity != null && User.Identity.IsAuthenticated
-                        && !User.IsInRole("admin") && !User.IsInRole("manager"))
-                    {
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">Мої замовлення</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Categories" asp-action="Index">Категорії</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Carts" asp-action="Index">Кошик</a>
-                            </li>
-                        </ul>
-                    }
+                        @* Замовлення (тільки для авторизованих) *@
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole("manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">
+                                        Замовлення
+                                    </a>
+                                </li>
+                            }
+                            else if (!User.IsInRole("admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Orders" asp-action="Index">
+                                        Мої замовлення
+                                    </a>
+                                </li>
+                            }
+                        }
 
+                        @* Категорії *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Categories" asp-action="Index">
+                                Категорії
+                            </a>
+                        </li>
+
+                        @* Кошик *@
+                        @if (!User.IsInRole("admin") && !User.IsInRole("manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Carts" asp-action="Index">
+                                    Кошик
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <!-- ПРАВЕ МЕНЮ -->
                     <ul class="navbar-nav">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
@@ -60,16 +75,22 @@
                             @if (User.IsInRole("admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Roles" asp-action="UserList">Користувачі</a>
+                                    <a class="nav-link text-dark" asp-controller="Roles" asp-action="UserList">
+                                        Користувачі
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">Ролі</a>
+                                    <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">
+                                        Ролі
+                                    </a>
                                 </li>
                             }
 
                             <li class="nav-item">
                                 <form method="post" asp-controller="Account" asp-action="Logout" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-dark border-0">Вихід</button>
+                                    <button type="submit" class="btn btn-link nav-link text-dark border-0">
+                                        Вихід
+                                    </button>
                                 </form>
                             </li>
                         }
@@ -83,6 +104,7 @@
                             </li>
                         }
                     </ul>
+
                 </div>
             </div>
         </nav>

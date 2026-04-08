@@ -1,65 +1,149 @@
 ﻿@model IEnumerable<WebShopDomain.Model.Order>
 
 @{
-    var title = User.IsInRole("manager") ? "Замовлення" : "Мої замовлення";
-    ViewData["Title"] = title;
+    bool isManager = User.IsInRole("manager");
+    ViewData["Title"] = isManager ? "Керування замовленнями" : "Мої замовлення";
+
+    var activeOrders = Model.Where(o => o.Orderstatus?.Statusname != "Виконано").ToList();
+    var completedOrders = Model.Where(o => o.Orderstatus?.Statusname == "Виконано").ToList();
 }
 
-<h1>@title</h1>
+<h1>@ViewData["Title"]</h1>
 
-@if (!Model.Any())
-{
-    <p>У вас ще немає замовлень.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Номер замовлення</th>
-                <th>Дата</th>
-                <th>Сума</th>
-                <th>Статус</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+<!-- ТАБЛИЦЯ АКТИВНИХ ЗАМОВЛЕНЬ -->
+<section class="mb-5">
+    @if (!activeOrders.Any())
+    {
+        <p class="text-muted">Активних замовлень немає.</p>
+    }
+    else
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
                 <tr>
-                    <td>@item.Id</td>
-                    <td>@item.Orderdate?.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>@item.Totalamount ₴</td>
-                    <td>
-                        @if (User.IsInRole("manager"))
-                        {
-                            <form asp-action="UpdateStatus" method="post">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="orderId" value="@item.Id" />
-
-                                <select name="statusId" onchange="this.form.submit()" class="form-select form-select-sm">
-                                    @foreach (var status in ViewBag.Statuses)
-                                    {
-                                        <option value="@status.Id"
-                                                selected="@(status.Id == item.Orderstatusid)">
-                                            @status.Statusname
-                                        </option>
-                                    }
-                                </select>
-                            </form>
-                        }
-                        else
-                        {
-                            @item.Orderstatus?.Statusname
-                        }
-                    </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
-                            Деталі
-                        </a>
-                    </td>
+                    <th>#</th>
+                    <th>Дата</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var item in activeOrders)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Orderdate?.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@item.Totalamount ₴</td>
+                        <td>
+                            @if (isManager)
+                            {
+                                <button class="btn btn-outline-secondary btn-sm" onclick="toggleManage(@item.Id)">
+                                    Керувати
+                                </button>
+                                <div id="manage-@item.Id" style="display:none;" class="mt-2 p-2 border rounded bg-light">
+                                    <form asp-action="UpdateStatus" method="post" class="d-flex gap-1 mb-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@item.Id" />
+                                        <select name="statusId" class="form-select form-select-sm">
+                                            @foreach (var status in ViewBag.Statuses ?? new List<dynamic>())
+                                            {
+                                                <option value="@status.Id" selected="@(status.Id == item.Orderstatusid)">
+                                                    @status.Statusname
+                                                </option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
+                                    </form>
+                                    
+                                    <form asp-action="Delete" method="post" onsubmit="return confirm('Видалити замовлення #@item.Id?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-link text-danger btn-sm p-0">Видалити замовлення</button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info text-dark">@item.Orderstatus?.Statusname</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Деталі</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>
+
+<hr />
+
+<!-- ТАБЛИЦЯ ВИКОНАНИХ ЗАМОВЛЕНЬ -->
+<section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="text-success">Виконані замовлення</h3>
+        
+        @if (isManager && completedOrders.Any())
+        {
+            <form asp-action="ClearCompleted" method="post" onsubmit="return confirm('Ви впевнені, що хочете видалити ВСІ виконані замовлення?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    Очистити список виконаних
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (!completedOrders.Any())
+    {
+        <p class="text-muted">У цій категорії поки порожньо.</p>
+    }
+    else
+    {
+        <table class="table table-sm table-striped border-top">
+            <thead class="text-muted">
+                <tr>
+                    <th>#</th>
+                    <th>Дата</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th class="text-end">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in completedOrders)
+                {
+                    <tr class="opacity-75">
+                        <td>@item.Id</td>
+                        <td>@item.Orderdate?.ToString("dd.MM.yyyy")</td>
+                        <td>@item.Totalamount ₴</td>
+                        <td><span class="badge bg-success">@item.Orderstatus?.Statusname</span></td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light btn-sm border">Деталі</a>
+                                
+                                @if (isManager)
+                                {
+                                    <form asp-action="Delete" method="post" onsubmit="return confirm('Видалити замовлення #@item.Id?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Видалити</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>
+
+<script>
+    function toggleManage(orderId) {
+        const panel = document.getElementById("manage-" + orderId);
+        panel.style.display = panel.style.display === "none" ? "block" : "none";
+    }
+</script>

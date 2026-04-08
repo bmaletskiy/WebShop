@@ -1,52 +1,61 @@
 ﻿@model WebShopDomain.Model.Product
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Додати товар";
 }
 
-<h1>Create</h1>
+<h1>Додати товар</h1>
 
-<h4>Product</h4>
+<p class="text-muted">
+    Категорія: @ViewBag.CategoryName
+</p>
+
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Categoryid" class="control-label"></label>
-                <select asp-for="Categoryid" class ="form-control" asp-items="ViewBag.Categoryid"></select>
-            </div>
-            <div class="form-group">
+
+            <input type="hidden" asp-for="Categoryid" value="@ViewBag.CategoryId" />
+
+            <div class="form-group mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Availableqty" class="control-label"></label>
                 <input asp-for="Availableqty" class="form-control" />
                 <span asp-validation-for="Availableqty" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Створити" class="btn btn-success" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="mt-3">
+    <a asp-action="Index" asp-route-id="@ViewBag.CategoryId">← Назад</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

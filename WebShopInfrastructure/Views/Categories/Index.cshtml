@@ -1,51 +1,151 @@
 ﻿@model IEnumerable<WebShopDomain.Model.Category>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Категорії";
 }
 
-<h1>Категорії</h1>
+<div class="container mt-4">
 
-@if (User.IsInRole("admin"))
-{
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-}
+    <h2 class="mb-4">Категорії</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoryname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoryinfo)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+    @if (User.IsInRole("manager"))
+    {
+        <div class="mb-5">
+            <h4>Статистика продажів</h4>
+            <div id="popularProductsChart"></div>
+        </div>
+
+        <div class="mb-5">
+            <h4>Продажі по категоріях</h4>
+            <div id="categorySalesChart"></div>
+        </div>
+    }
+
+    @if (User.IsInRole("admin"))
+    {
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-success">
+                + Створити категорію
+            </a>
+        </div>
+    }
+
+    <div class="row g-4">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Categoryname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Categoryinfo)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    @if (User.IsInRole("admin"))
-                    {
-                        <span> | </span>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        <span> | </span>
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    }
-                </td>
-            </tr>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm border-0">
+
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+
+                        <h5 class="card-title">
+                            @item.Categoryname
+                        </h5>
+
+                        <p class="card-text text-muted small flex-grow-1">
+                            @item.Categoryinfo
+                        </p>
+
+                        <div class="mt-3">
+
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn btn-outline-dark w-100 mb-2">
+                                Переглянути
+                            </a>
+
+                            @if (User.IsInRole("admin"))
+                            {
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.Id"
+                                           class="btn btn-warning btn-sm w-50">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="btn btn-danger btn-sm w-50">
+                                        Delete
+                                    </a>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script>
+        google.charts.load('current', { packages: ['corechart'] });
+
+        google.charts.setOnLoadCallback(() => {
+        drawChart();
+        drawCategorySales();
+        });
+
+        function drawChart() {
+        fetch('/api/charts/popularProducts')
+        .then(response => response.json())
+        .then(data => {
+
+        const dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn('string', 'Товар');
+        dataTable.addColumn('number', 'Продажі');
+
+        data.forEach(item => {
+        dataTable.addRow([item.name, item.count]);
+        });
+
+        const options = {
+        title: 'Найпопулярніші товари',
+        width: 800,
+        height: 400,
+        legend: { position: 'none' }
+        };
+
+        const chart = new google.visualization.ColumnChart(
+        document.getElementById('popularProductsChart')
+        );
+
+        chart.draw(dataTable, options);
+        });
+        }
+
+        function drawCategorySales() {
+        fetch('/api/charts/categorySales')
+        .then(response => response.json())
+        .then(data => {
+
+        const dataTable = new google.visualization.DataTable();
+
+        dataTable.addColumn('string', 'Категорія');
+        dataTable.addColumn('number', 'Продажі');
+
+        data.forEach(item => {
+        dataTable.addRow([item.categoryName, item.count]);
+        });
+
+        const options = {
+        title: 'Найпопулярніші категорії',
+        width: 800,
+        height: 400,
+        legend: { position: 'none' }
+        };
+
+        const chart = new google.visualization.ColumnChart(
+        document.getElementById('categorySalesChart')
+        );
+
+        chart.draw(dataTable, options);
+        });
+        }
+    </script>
+}

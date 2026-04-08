@@ -110,5 +110,44 @@ namespace WebShopInfrastructure.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        // Видалення одного замовлення
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (!User.IsInRole("manager") && !User.IsInRole("admin"))
+                return Forbid();
+
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+                return NotFound();
+
+            _context.Orders.Remove(order);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Очищення всіх виконаних замовлень
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ClearCompleted()
+        {
+            if (!User.IsInRole("manager") && !User.IsInRole("admin"))
+                return Forbid();
+
+            var completedOrders = _context.Orders
+                .Include(o => o.Orderstatus)
+                .Where(o => o.Orderstatus.Statusname == "Виконано");
+
+            if (await completedOrders.AnyAsync())
+            {
+                _context.Orders.RemoveRange(completedOrders);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
