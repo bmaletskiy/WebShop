@@ -8,6 +8,20 @@
 
     <h3 class="mb-4">Товари: @ViewBag.CategoryName</h3>
 
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+
+        <a asp-controller="Products" asp-action="Import"
+               class="btn btn-primary">
+            Імпорт з Excel
+        </a>
+
+        <a asp-controller="Products" asp-action="Export"
+               class="btn btn-success">
+            Експорт в Excel
+        </a>
+
+    </div>
+
     @if (User.IsInRole("admin"))
     {
         <div class="mb-3">

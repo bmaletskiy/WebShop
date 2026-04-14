@@ -1,12 +1,15 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using WebShopInfrastructure.Models;
-using WebShopInfrastructure;
+using Microsoft.EntityFrameworkCore;
 using WebShop.Models;
+using WebShopDomain.Model;
+using WebShopInfrastructure;
+using WebShopInfrastructure.Models;
+using WebShopInfrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IDataPortServiceFactory<Product>, ProductDataPortServiceFactory>();
 
 builder.Services.AddDbContext<DbWebShopContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

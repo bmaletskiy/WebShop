@@ -3,16 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebShopDomain.Model;
 using WebShopInfrastructure.Models;
+using WebShopInfrastructure.Services;
 
 namespace WebShopInfrastructure.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly DbWebShopContext _context;
+        private readonly IDataPortServiceFactory<Product> _dataPortFactory;
 
-        public ProductsController(DbWebShopContext context)
+        public ProductsController(
+            DbWebShopContext context,
+            IDataPortServiceFactory<Product> dataPortFactory)
         {
             _context = context;
+            _dataPortFactory = dataPortFactory;
         }
 
         public async Task<IActionResult> Index(int? id)
@@ -176,6 +181,42 @@ namespace WebShopInfrastructure.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Import()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Import(IFormFile fileExcel, CancellationToken cancellationToken)
+        {
+            if (fileExcel == null || fileExcel.Length == 0)
+                return BadRequest("Файл не вибрано");
+
+            var importService = _dataPortFactory.GetImportService(fileExcel.ContentType);
+
+            using var stream = fileExcel.OpenReadStream();
+            await importService.ImportFromStreamAsync(stream, cancellationToken);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Export(
+            string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            CancellationToken cancellationToken = default)
+        {
+            var exportService = _dataPortFactory.GetExportService(contentType);
+
+            var stream = new MemoryStream();
+
+            await exportService.WriteToAsync(stream, cancellationToken);
+
+            stream.Position = 0;
+
+            return File(stream, contentType, $"products_{DateTime.Now:yyyyMMdd}.xlsx");
         }
 
         private bool ProductExists(int id)

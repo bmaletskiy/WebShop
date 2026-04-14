@@ -1,6 +1,6 @@
 ﻿namespace WebShopInfrastructure.Services
 {
-    public interface IImportSevice<TEntity>
+    public interface IImportService<TEntity>
         where TEntity : class
     {
         Task ImportFromStreamAsync(Stream stream, CancellationToken cancellationToken);
