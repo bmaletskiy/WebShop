@@ -1,17 +1,48 @@
 ﻿@{
-    ViewData["Title"] = "Лабораторна робота WebShop";
+    ViewData["Title"] = "Головна";
 }
 
-@if (User.Identity.IsAuthenticated)
-{
-    <p>@User.Identity.Name</p>
+<div class="text-center mb-5">
+    <h1 class="display-5">Лабораторна робота WebShop 🛒</h1>
+    <p class="lead">Навчальний інтернет-магазин на ASP.NET Core</p>
+</div>
 
-    <form method="post" asp-controller="Account" asp-action="Logout">
-        <input type="submit" value="Вихід" />
-    </form>
-}
-else
-{
-    <a asp-controller="Account" asp-action="Login">Вхід</a>
-    <a asp-controller="Account" asp-action="Register">Реєстрація</a>
-}
+<hr />
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+        <h4>📌 Про проєкт</h4>
+        <p>
+            Це веб-додаток інтернет-магазину, який реалізує базовий функціонал:
+            роботу з товарами, категоріями, кошиком та замовленнями.
+        </p>
+
+        <ul>
+            <li>ASP.NET Core MVC</li>
+            <li>Entity Framework Core</li>
+            <li>Авторизація та ролі</li>
+        </ul>
+    </div>
+
+    <div class="col-md-6">
+        <h4>⚙️ Можливості</h4>
+        <ul>
+            <li>Перегляд категорій і товарів</li>
+            <li>Додавання товарів у кошик</li>
+            <li>Оформлення замовлення</li>
+            <li>Розмежування ролей (admin / manager / user)</li>
+        </ul>
+    </div>
+
+</div>
+
+<hr />
+
+<div class="mt-4">
+    <h4>ℹ️ Інформація</h4>
+    <p>
+        Для навігації використовуйте верхнє меню.
+        Доступ до функцій залежить від ролі користувача.
+    </p>
+</div>
