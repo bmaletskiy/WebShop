@@ -27,11 +27,11 @@ namespace WebShopInfrastructure.Controllers
                 .ToListAsync(cancellationToken);
 
             var result = rawData
-                .GroupBy(x => x.Product.Category.Categoryname)
-                .Select(g => new CategorySalesItem(
+            .GroupBy(x => x.Product?.Category?.Categoryname ?? "Без категорії")
+            .Select(g => new CategorySalesItem(
                     g.Key,
                     g.Sum(x => x.Quantity)
-                ))
+                            ))
                 .OrderByDescending(x => x.Count)
                 .ToList();
 

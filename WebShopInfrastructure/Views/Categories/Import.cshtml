@@ -1,4 +1,4 @@
-﻿<h3 class="mb-4">Імпорт товарів</h3>
+﻿<h3 class="mb-4">Імпорт категорій</h3>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -13,7 +13,6 @@
 }
 
 <form asp-action="Import" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
 
     <div class="mb-3">
         <label class="form-label">Оберіть Excel файл</label>

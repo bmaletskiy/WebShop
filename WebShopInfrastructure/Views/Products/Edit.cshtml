@@ -4,19 +4,13 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Редагування</h1>
 
-<h4>Product</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Categoryid" class="control-label"></label>
-                <select asp-for="Categoryid" class="form-control" asp-items="ViewBag.Categoryid"></select>
-                <span asp-validation-for="Categoryid" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -29,7 +23,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
+                <input asp-for="Price" class="form-control" type="number" step="any" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -48,6 +42,7 @@
                 <span asp-validation-for="Updatedat" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Categoryid" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

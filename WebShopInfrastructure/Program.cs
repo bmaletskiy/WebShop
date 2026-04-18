@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IDataPortServiceFactory<Product>, ProductDataPortServiceFactory>();
+builder.Services.AddScoped<IDataPortServiceFactory<Category>, CategoryDataPortServiceFactory>();
 
 builder.Services.AddDbContext<DbWebShopContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

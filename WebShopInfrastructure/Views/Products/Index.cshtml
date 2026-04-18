@@ -8,22 +8,22 @@
 
     <h3 class="mb-4">Товари: @ViewBag.CategoryName</h3>
 
-    <div class="mb-3 d-flex gap-2 flex-wrap">
-
-        <a asp-controller="Products" asp-action="Import"
-               class="btn btn-primary">
-            Імпорт з Excel
-        </a>
-
-        <a asp-controller="Products" asp-action="Export"
-               class="btn btn-success">
-            Експорт в Excel
-        </a>
-
-    </div>
-
     @if (User.IsInRole("admin"))
     {
+        <div class="mb-3 d-flex gap-2 flex-wrap">
+
+            <a asp-controller="Products" asp-action="Import"
+                   class="btn btn-primary">
+                Імпорт з Excel
+            </a>
+
+            <a asp-controller="Products" asp-action="Export"
+                   class="btn btn-success">
+                Експорт в Excel
+            </a>
+
+        </div>
+
         <div class="mb-3">
             <a asp-action="Create" asp-route-categoryId="@ViewBag.CategoryId"
                    class="btn btn-success">
@@ -48,29 +48,24 @@
 
                         <div class="card-body d-flex flex-column">
 
-                            <!-- Назва -->
                             <h5 class="card-title">
                                 @item.Name
                             </h5>
 
-                            <!-- Опис -->
                             <p class="card-text text-muted small">
                                 @item.Description
                             </p>
 
-                            <!-- Ціна -->
                             <div class="mt-auto mb-2">
                                 <span class="fs-5 fw-bold">
                                     @item.Price ₴
                                 </span>
                             </div>
 
-                            <!-- Кількість -->
                             <div class="text-muted small mb-2">
                                 В наявності: @item.Availableqty
                             </div>
 
-                            <!-- Кнопки -->
                             <div class="d-grid gap-2">
 
                                 <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id"

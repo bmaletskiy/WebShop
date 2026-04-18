@@ -183,26 +183,54 @@ namespace WebShopInfrastructure.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult Import()
         {
             return View();
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Import(IFormFile fileExcel, CancellationToken cancellationToken)
         {
             if (fileExcel == null || fileExcel.Length == 0)
-                return BadRequest("Файл не вибрано");
+            {
+                ModelState.AddModelError("", "Оберіть файл");
+                return View();
+            }
 
-            var importService = _dataPortFactory.GetImportService(fileExcel.ContentType);
+            var extension = Path.GetExtension(fileExcel.FileName);
+            if (extension != ".xlsx")
+            {
+                ModelState.AddModelError("", "Дозволені тільки файли .xlsx");
+                return View();
+            }
 
-            using var stream = fileExcel.OpenReadStream();
-            await importService.ImportFromStreamAsync(stream, cancellationToken);
+            try
+            {
+                var importService = _dataPortFactory.GetImportService(fileExcel.ContentType);
 
-            return RedirectToAction(nameof(Index));
+                using var stream = fileExcel.OpenReadStream();
+                await importService.ImportFromStreamAsync(stream, cancellationToken);
+
+                TempData["Success"] = "Файл успішно імпортовано!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Помилка при імпорті файлу");
+            }
+
+            return View();
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> Export(
             string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

@@ -19,6 +19,8 @@ namespace WebShopInfrastructure.Services
             if (!stream.CanRead)
                 throw new ArgumentException("Дані не можуть бути прочитані", nameof(stream));
 
+            var errors = new List<string>();
+
             using (var workbook = new XLWorkbook(stream))
             {
                 foreach (var worksheet in workbook.Worksheets)
@@ -36,35 +38,57 @@ namespace WebShopInfrastructure.Services
                         };
 
                         _context.Categories.Add(category);
-                        await _context.SaveChangesAsync(cancellationToken); 
+                        await _context.SaveChangesAsync(cancellationToken);
                     }
 
                     foreach (var row in worksheet.RowsUsed().Skip(1))
                     {
-                        await AddOrUpdateProductAsync(row, category, cancellationToken);
+                        await AddOrUpdateProductAsync(row, category, errors, cancellationToken);
                     }
                 }
+            }
+
+            if (errors.Any())
+            {
+                throw new ArgumentException(string.Join("\n", errors));
             }
 
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task AddOrUpdateProductAsync(IXLRow row, Category category, CancellationToken cancellationToken)
+        private async Task AddOrUpdateProductAsync(
+            IXLRow row,
+            Category category,
+            List<string> errors,
+            CancellationToken cancellationToken)
         {
+            var rowNumber = row.RowNumber();
+
             var productName = row.Cell(1).GetValue<string>();
 
             if (string.IsNullOrWhiteSpace(productName))
+            {
+                errors.Add($"Рядок {rowNumber}: порожня назва товару");
                 return;
+            }
 
-            decimal price;
-            int quantity;
-
-            //ВАЛІДАЦІЯ
-            if (!decimal.TryParse(row.Cell(3).GetValue<string>(), out price))
+            if (!decimal.TryParse(row.Cell(3).GetString(), out decimal price))
+            {
+                errors.Add($"Рядок {rowNumber}: некоректна ціна");
                 return;
+            }
 
-            if (!int.TryParse(row.Cell(4).GetValue<string>(), out quantity))
-                quantity = 0;
+            if (!int.TryParse(row.Cell(4).GetString(), out int quantity))
+            {
+                errors.Add($"Рядок {rowNumber}: некоректна кількість");
+                return;
+            }
+
+            if (quantity < 0)
+            {
+                errors.Add($"Рядок {rowNumber}: кількість не може бути від’ємною");
+                return;
+            }
 
             var existingProduct = await _context.Products
                 .FirstOrDefaultAsync(p => p.Name == productName && p.Categoryid == category.Id, cancellationToken);
@@ -75,22 +99,20 @@ namespace WebShopInfrastructure.Services
                 existingProduct.Price = price;
                 existingProduct.Availableqty = quantity;
                 existingProduct.Updatedat = DateTime.Now;
-
-                return;
             }
-
-            Product product = new Product
+            else
             {
-                Name = productName,
-                Description = row.Cell(2).GetValue<string>(),
-                Price = price,
-                Availableqty = quantity,
-                Categoryid = category.Id,
-                Createdat = DateTime.Now,
-                Updatedat = DateTime.Now
-            };
-
-            _context.Products.Add(product);
+                _context.Products.Add(new Product
+                {
+                    Name = productName,
+                    Description = row.Cell(2).GetValue<string>(),
+                    Price = price,
+                    Availableqty = quantity,
+                    Categoryid = category.Id,
+                    Createdat = DateTime.Now,
+                    Updatedat = DateTime.Now
+                });
+            }
         }
     }
 }

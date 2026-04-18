@@ -8,6 +8,27 @@
 
     <h2 class="mb-4">Категорії</h2>
 
+    @if (User.IsInRole("admin"))
+    {
+        <div class="mb-3 d-flex gap-2">
+
+            <a asp-action="Import" class="btn btn-primary">
+                Імпорт категорій
+            </a>
+
+            <a asp-action="Export" class="btn btn-success">
+                Експорт категорій
+            </a>
+
+        </div>
+
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-success">
+                + Створити категорію
+            </a>
+        </div>
+    }
+
     @if (User.IsInRole("manager"))
     {
         <div class="mb-5">
@@ -18,15 +39,6 @@
         <div class="mb-5">
             <h4>Продажі по категоріях</h4>
             <div id="categorySalesChart"></div>
-        </div>
-    }
-
-    @if (User.IsInRole("admin"))
-    {
-        <div class="mb-3">
-            <a asp-action="Create" class="btn btn-success">
-                + Створити категорію
-            </a>
         </div>
     }
 
@@ -94,15 +106,10 @@
         fetch('/api/charts/popularProducts')
         .then(response => response.json())
         .then(data => {
-
         const dataTable = new google.visualization.DataTable();
-
         dataTable.addColumn('string', 'Товар');
         dataTable.addColumn('number', 'Продажі');
-
-        data.forEach(item => {
-        dataTable.addRow([item.name, item.count]);
-        });
+        data.forEach(item => dataTable.addRow([item.name, item.count]));
 
         const options = {
         title: 'Найпопулярніші товари',
@@ -114,7 +121,6 @@
         const chart = new google.visualization.ColumnChart(
         document.getElementById('popularProductsChart')
         );
-
         chart.draw(dataTable, options);
         });
         }
@@ -123,15 +129,10 @@
         fetch('/api/charts/categorySales')
         .then(response => response.json())
         .then(data => {
-
         const dataTable = new google.visualization.DataTable();
-
         dataTable.addColumn('string', 'Категорія');
         dataTable.addColumn('number', 'Продажі');
-
-        data.forEach(item => {
-        dataTable.addRow([item.categoryName, item.count]);
-        });
+        data.forEach(item => dataTable.addRow([item.categoryName, item.count]));
 
         const options = {
         title: 'Найпопулярніші категорії',
@@ -143,7 +144,6 @@
         const chart = new google.visualization.ColumnChart(
         document.getElementById('categorySalesChart')
         );
-
         chart.draw(dataTable, options);
         });
         }

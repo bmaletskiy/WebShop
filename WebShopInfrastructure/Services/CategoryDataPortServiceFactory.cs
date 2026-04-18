@@ -3,33 +3,23 @@ using WebShopInfrastructure.Models;
 
 namespace WebShopInfrastructure.Services
 {
-    public class ProductDataPortServiceFactory : IDataPortServiceFactory<Product>
+    public class CategoryDataPortServiceFactory : IDataPortServiceFactory<Category>
     {
         private readonly DbWebShopContext _context;
 
-        public ProductDataPortServiceFactory(DbWebShopContext context)
+        public CategoryDataPortServiceFactory(DbWebShopContext context)
         {
             _context = context;
         }
 
-        public IImportService<Product> GetImportService(string contentType)
+        public IImportService<Category> GetImportService(string contentType)
         {
-            if (contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                return new ProductImportService(_context);
-            }
-
-            throw new NotImplementedException();
+            return new CategoryImportService(_context);
         }
 
-        public IExportService<Product> GetExportService(string contentType)
+        public IExportService<Category> GetExportService(string contentType)
         {
-            if (contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                return new ProductExportService(_context);
-            }
-
-            throw new NotImplementedException();
+            return new CategoryExportService(_context);
         }
     }
 }
