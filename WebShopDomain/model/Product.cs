@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Http;
 
 namespace WebShopDomain.Model;
 
@@ -21,6 +23,12 @@ public partial class Product : Entity
     public DateTime? Createdat { get; set; }
 
     public DateTime? Updatedat { get; set; }
+
+
+    public string? ImageUrl { get; set; } // шлях до картинки
+
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; } // для форми
 
     public virtual ICollection<Cartitem> Cartitems { get; set; } = new List<Cartitem>();
     [Display(Name="Категорія")]

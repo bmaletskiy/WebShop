@@ -14,7 +14,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="Categoryid" value="@ViewBag.CategoryId" />
@@ -41,6 +41,11 @@
                 <label asp-for="Availableqty" class="control-label"></label>
                 <input asp-for="Availableqty" class="form-control" />
                 <span asp-validation-for="Availableqty" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ImageFile" class="control-label">Фото товару</label>
+                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
             </div>
 
             <div class="form-group">

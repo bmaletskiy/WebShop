@@ -25,4 +25,8 @@
     <ProjectReference Include="..\WebShopDomain\WebShopDomain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

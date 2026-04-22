@@ -85,16 +85,31 @@ namespace WebShopInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (product.ImageFile != null)
+                {
+                    string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+
+                    if (!Directory.Exists(folder))
+                        Directory.CreateDirectory(folder);
+
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(product.ImageFile.FileName);
+                    string filePath = Path.Combine(folder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await product.ImageFile.CopyToAsync(stream);
+                    }
+
+                    product.ImageUrl = "/images/" + fileName;
+                }
+
                 product.Createdat = DateTime.Now;
                 product.Updatedat = DateTime.Now;
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index), new
-                {
-                    id = product.Categoryid
-                });
+                return RedirectToAction(nameof(Index), new { id = product.Categoryid });
             }
 
             return View(product);
@@ -124,7 +139,43 @@ namespace WebShopInfrastructure.Controllers
             {
                 try
                 {
+                    var existingProduct = await _context.Products
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.Id == id);
+
+                    if (product.ImageFile != null)
+                    {
+                        string folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(product.ImageFile.FileName);
+                        string filePath = Path.Combine(folder, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await product.ImageFile.CopyToAsync(stream);
+                        }
+
+                        product.ImageUrl = "/images/" + fileName;
+
+                        if (!string.IsNullOrEmpty(existingProduct?.ImageUrl))
+                        {
+                            string oldPath = Path.Combine(
+                                Directory.GetCurrentDirectory(),
+                                "wwwroot",
+                                existingProduct.ImageUrl.TrimStart('/')
+                            );
+
+                            if (System.IO.File.Exists(oldPath))
+                                System.IO.File.Delete(oldPath);
+                        }
+                    }
+                    else
+                    {
+                        product.ImageUrl = existingProduct?.ImageUrl;
+                    }
+
                     product.Updatedat = DateTime.Now;
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -136,10 +187,7 @@ namespace WebShopInfrastructure.Controllers
                         throw;
                 }
 
-                return RedirectToAction(nameof(Index), new
-                {
-                    id = product.Categoryid
-                });
+                return RedirectToAction(nameof(Index), new { id = product.Categoryid });
             }
 
             return View(product);

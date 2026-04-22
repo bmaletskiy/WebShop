@@ -1,7 +1,7 @@
 ﻿@model WebShopDomain.Model.Product
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редагування";
 }
 
 <h1>Редагування</h1>
@@ -9,51 +9,62 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" type="number" step="any" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Availableqty" class="control-label"></label>
                 <input asp-for="Availableqty" class="form-control" />
                 <span asp-validation-for="Availableqty" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Createdat" class="control-label"></label>
-                <input asp-for="Createdat" class="form-control" />
-                <span asp-validation-for="Createdat" class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label asp-for="ImageFile" class="control-label">Фото товару</label>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.ImageUrl" style="max-height: 150px; object-fit: contain;" />
+                        <p class="text-muted small">Поточне фото</p>
+                    </div>
+                }
+                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                <span class="text-muted small">Залиште порожнім, щоб не змінювати фото</span>
             </div>
-            <div class="form-group">
-                <label asp-for="Updatedat" class="control-label"></label>
-                <input asp-for="Updatedat" class="form-control" />
-                <span asp-validation-for="Updatedat" class="text-danger"></span>
-            </div>
+
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="Categoryid" />
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="mt-3">
+    <a asp-action="Index" asp-route-id="@Model.Categoryid">← Назад</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
